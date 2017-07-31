@@ -7,14 +7,24 @@ primitive JSONRPCRequestParser
 
     let root = doc.data as JsonObject
     let method = root.data("method")? as String
-    let id = root.data("id")? as JsonType
-    let request_id: RequestIDType = match id
-    | let i: I64 => i 
-    | let s: String => s
-    else
-      None
-    end 
+    let request_id: RequestIDType =
+      if root.data.contains("id") then
+        let id = root.data("id")? as JsonType
+        match id
+        | let i: I64 => i 
+        | let s: String => s
+        else
+          None
+        end
+      else
+        None 
+      end 
 
-    let params = root.data("params")? 
+    let params = 
+      if root.data.contains("params") then
+        root.data("params")? 
+      else
+        None
+      end 
 
     JSONRPCRequest(method, params, request_id)

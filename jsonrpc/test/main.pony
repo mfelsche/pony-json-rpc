@@ -11,6 +11,40 @@ actor Main is TestList
   fun tag tests(test: PonyTest) =>
     test(_TestParseRequestArrayParams)
     test(_TestParseRequestObjectParams)
+    test(_TestParseRequestNoId)
+    test(_TestParseRequestNoParams)
+
+class iso _TestParseRequestNoId is UnitTest
+  """
+  Test basic parsing of a JSON-RPC 2.0 request. Test assures that the parser primitive can deal with no ID (aka a 'notification')
+  """
+  fun name(): String => "JSONRPC/parserequest/noid"
+
+  fun apply(h: TestHelper) ? =>
+    let src =
+      """
+      {"jsonrpc": "2.0", "method": "foobar", "params": [42, 23]}
+      """
+    let request = JSONRPCRequestParser.parse_request(src)?
+    h.assert_eq[String]("foobar", request.method)   
+    let array = request.params as JsonArray 
+    h.assert_eq[USize](2, array.data.size())
+    h.assert_eq[I64](42, array.data(0)? as I64)
+    h.assert_eq[I64](23, array.data(1)? as I64)
+ 
+class iso _TestParseRequestNoParams is UnitTest
+  """
+  Test basic parsing of a JSON-RPC 2.0 request. Test assures that the parser primitive can deal with no Params 
+  """
+  fun name(): String => "JSONRPC/parserequest/noparams"
+
+  fun apply(h: TestHelper) ? =>
+    let src =
+      """
+      {"jsonrpc": "2.0", "method": "foobar"}
+      """
+    let request = JSONRPCRequestParser.parse_request(src)?
+    h.assert_eq[String]("foobar", request.method)    
 
 class iso _TestParseRequestArrayParams is UnitTest
   """

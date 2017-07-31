@@ -2,8 +2,7 @@ use "json"
 
 type RequestIDType is (String | I64 | None)
 
-class JSONRPCRequest
-  let jsonrpc : String = "2.0"
+class JSONRPCRequest  
   let method : String
   let params : JsonType
   let id : RequestIDType
