@@ -19,7 +19,7 @@ class Error
     data = data'
 
 
-class JSONRPCResponse  
+class Response  
   let method : String
   let params : JsonType
   let id : RequestIDType

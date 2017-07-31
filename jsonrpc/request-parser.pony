@@ -1,7 +1,7 @@
 use "json"
 
-primitive JSONRPCRequestParser
-  fun tag parse_request(json: String): JSONRPCRequest ? =>
+primitive RequestParser
+  fun tag parse_request(json: String): Request ? =>
     let doc: JsonDoc = JsonDoc
     doc.parse(json)?
 
@@ -27,4 +27,4 @@ primitive JSONRPCRequestParser
         None
       end 
 
-    JSONRPCRequest(method, params, request_id)
+    Request(method, params, request_id)

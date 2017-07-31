@@ -25,7 +25,7 @@ class iso _TestParseRequestNoId is UnitTest
       """
       {"jsonrpc": "2.0", "method": "foobar", "params": [42, 23]}
       """
-    let request = JSONRPCRequestParser.parse_request(src)?
+    let request = RequestParser.parse_request(src)?
     h.assert_eq[String]("foobar", request.method)   
     let array = request.params as JsonArray 
     h.assert_eq[USize](2, array.data.size())
@@ -43,7 +43,7 @@ class iso _TestParseRequestNoParams is UnitTest
       """
       {"jsonrpc": "2.0", "method": "foobar"}
       """
-    let request = JSONRPCRequestParser.parse_request(src)?
+    let request = RequestParser.parse_request(src)?
     h.assert_eq[String]("foobar", request.method)    
 
 class iso _TestParseRequestArrayParams is UnitTest
@@ -58,7 +58,7 @@ class iso _TestParseRequestArrayParams is UnitTest
       """
       {"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}
       """
-    let request = JSONRPCRequestParser.parse_request(src)?
+    let request = RequestParser.parse_request(src)?
     h.assert_eq[String]("subtract", request.method)
     match request.id
     | let ids: String => h.fail("Shouldn't get a string for the ID")
@@ -84,7 +84,7 @@ class iso _TestParseRequestObjectParams is UnitTest
       """
       {"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 1}
       """
-    let request = JSONRPCRequestParser.parse_request(src)?
+    let request = RequestParser.parse_request(src)?
     h.assert_eq[String]("subtract", request.method)
     match request.id
     | let ids: String => h.fail("Shouldn't get a string for the ID")
