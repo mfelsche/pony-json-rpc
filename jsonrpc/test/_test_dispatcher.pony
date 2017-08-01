@@ -12,6 +12,7 @@ class iso _TestDispatchGreet is UnitTest
   fun name(): String => "JSONRPC/dispatcher/greet"
 
   fun apply(h: TestHelper) ? =>          
+    h.long_test(30000)
     let src = 
       """
       {"jsonrpc": "2.0", "method": "greet", "params": "bob", "id": 1}
@@ -22,8 +23,11 @@ class iso _TestDispatchGreet is UnitTest
     dispatcher.register_handler("greet", handler)
 
     let p = Promise[Response val]
-    p.next[None]( {(r:Response val): None => h.assert_true(true)} iso,
-                  {(): None => h.fail("promise rejected")} iso)
+    p.next[None]( {(r:Response val): None ? => 
+                    h.assert_eq[String]("hello bob", r.result as String)
+                    h.complete(true) } iso,
+                  {(): None =>                     
+                    h.complete(false) } iso)
        
     dispatcher.dispatch_request(request, p) 
 
