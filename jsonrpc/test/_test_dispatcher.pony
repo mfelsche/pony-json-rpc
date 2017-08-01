@@ -19,10 +19,13 @@ class iso _TestDispatchGreet is UnitTest
     let request= RequestParser.parse_request(src)?
     let handler = _HelloWorld
     let dispatcher = Dispatcher 
-//    dispatcher.register_handler("greet", handler)
+    dispatcher.register_handler("greet", handler)
 
-  //  let p = Promise[Response val]
-   // dispatcher.dispatch_request(request) 
+    let p = Promise[Response val]
+    p.next[None]( {(r:Response val): None => h.assert_true(true)} iso,
+                  {(): None => h.fail("promise rejected")} iso)
+       
+    dispatcher.dispatch_request(request, p) 
 
 actor _HelloWorld is MethodHandler
   be handle(request: Request val, p: Promise[Response val]) =>  
