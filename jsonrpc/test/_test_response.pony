@@ -45,7 +45,7 @@ class iso _TestResponseError is UnitTest
     let target = 
       """{"error":{"message":"Method not found","code":-32601},"jsonrpc":"2.0","id":1}"""
 
-    let resp = Response("bamfiz", None, I64(1), Error(ErrorCodes.method_not_found(), "Method not found", None))
+    let resp = Response("bamfiz", None, I64(1), recover val Error(ErrorCodes.method_not_found(), "Method not found", None) end)
     let resp_json = resp.to_json()
     h.assert_eq[String](target, resp_json)
 
@@ -59,7 +59,7 @@ class iso _TestResponseErrorNoID is UnitTest
     let target = 
       """{"error":{"message":"Invalid Request","code":-32600},"jsonrpc":"2.0","id":null}"""
 
-    let resp = Response("bamfiz", None, None, Error(ErrorCodes.invalid_request(), "Invalid Request", None))
+    let resp = Response("bamfiz", None, None, recover val Error(ErrorCodes.invalid_request(), "Invalid Request", None) end)
     let resp_json = resp.to_json()
     h.assert_eq[String](target, resp_json)
 

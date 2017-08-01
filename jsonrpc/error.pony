@@ -18,11 +18,12 @@ class Error
     message = message'
     data = data'
 
-  fun ref to_jsonobject(): JsonObject =>
+  fun to_jsonobject(): JsonObject =>
     let ob: JsonObject = JsonObject
     ob.data("code") = code
     ob.data("message") = message
-    if data isnt None then 
-      ob.data("data") = data 
-    end
+    // TODO - figure out how to add this back in later.
+    //if data isnt None then       
+    //  ob.data("data") = data 
+    //end
     ob 
