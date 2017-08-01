@@ -22,5 +22,7 @@ class Error
     let ob: JsonObject = JsonObject
     ob.data("code") = code
     ob.data("message") = message
-    ob.data("data") = data 
+    if data isnt None then 
+      ob.data("data") = data 
+    end
     ob 

@@ -17,14 +17,12 @@ class Response
     let doc:JsonDoc = JsonDoc
     
     var dmap: Map[String, JsonType] = Map[String, JsonType]
-    dmap("jsonrpc") = "2.0"
+    dmap("jsonrpc") = "2.0"      
+    dmap("id") = id
     
     match err
     | let e: Error => dmap("error") = e.to_jsonobject()
     else    
-      if id isnt None then
-        dmap("id") = id
-      end
       if result isnt None then        
         dmap("result") = result
       end 

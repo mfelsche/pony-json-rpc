@@ -14,3 +14,5 @@ actor Main is TestList
 
     test(_TestResponseScalar)
     test(_TestResponseArray)
+    test(_TestResponseError)
+    test(_TestResponseErrorNoID)
