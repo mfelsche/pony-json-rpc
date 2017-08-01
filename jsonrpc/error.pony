@@ -17,3 +17,10 @@ class Error
     code = code'
     message = message'
     data = data'
+
+  fun ref to_jsonobject(): JsonObject =>
+    let ob: JsonObject = JsonObject
+    ob.data("code") = code
+    ob.data("message") = message
+    ob.data("data") = data 
+    ob 
