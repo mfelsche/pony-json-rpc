@@ -1,7 +1,7 @@
 use "json"
 
 primitive RequestParser
-  fun tag parse_request(json: String): Request ? =>
+  fun tag parse_request(json: String): Request val? =>
     let doc: JsonDoc = JsonDoc
     doc.parse(json)?
 

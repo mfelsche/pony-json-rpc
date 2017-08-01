@@ -5,9 +5,9 @@ class Response
   let method : String
   let result : JsonType
   let id : RequestIDType
-  let err : (Error | None)
+  let err : (Error val | None)
 
-  new create(method': String, result': JsonType, id': RequestIDType, err' : (Error | None)) =>
+  new create(method': String, result': JsonType, id': RequestIDType, err' : (Error val| None) = None) =>
     method = method'
     result = result'
     id = id'
@@ -21,7 +21,7 @@ class Response
     dmap("id") = id
     
     match err
-    | let e: Error => dmap("error") = e.to_jsonobject()
+    | let e: Error val => dmap("error") = e.to_jsonobject()
     else    
       if result isnt None then        
         dmap("result") = result

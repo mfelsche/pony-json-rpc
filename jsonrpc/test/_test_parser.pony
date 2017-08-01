@@ -51,7 +51,7 @@ class iso _TestParseRequestNoId is UnitTest
       """
     let request = RequestParser.parse_request(src)?
     h.assert_eq[String]("foobar", request.method)   
-    let array = request.params as JsonArray 
+    let array = request.params as JsonArray val
     h.assert_eq[USize](2, array.data.size())
     h.assert_eq[I64](42, array.data(0)? as I64)
     h.assert_eq[I64](23, array.data(1)? as I64)
@@ -91,7 +91,7 @@ class iso _TestParseRequestArrayParams is UnitTest
       h.fail("Shouldn't get a none")
     end
 
-    let array = request.params as JsonArray 
+    let array = request.params as JsonArray val
     h.assert_eq[USize](2, array.data.size())
     h.assert_eq[I64](42, array.data(0)? as I64)
     h.assert_eq[I64](23, array.data(1)? as I64)
@@ -117,7 +117,7 @@ class iso _TestParseRequestObjectParams is UnitTest
       h.fail("Shouldn't get a none")
     end
 
-    let params = request.params as JsonObject 
+    let params = request.params as JsonObject val
     h.assert_eq[USize](2, params.data.size())
     h.assert_eq[I64](23, params.data("subtrahend")? as I64)
     h.assert_eq[I64](42, params.data("minuend")? as I64)

@@ -16,3 +16,5 @@ actor Main is TestList
     test(_TestResponseArray)
     test(_TestResponseError)
     test(_TestResponseErrorNoID)
+
+    test(_TestDispatchGreet)
