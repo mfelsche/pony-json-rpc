@@ -6,20 +6,19 @@ use ".."
 
 class iso _TestBadMethod is UnitTest
   """
-  Tests that the request parser fails properly when we don't pass 
-  a valid method 
+  Tests that the request parser fails properly when we don't pass
+  a valid method
   """
   fun name(): String => "JSONRPC/parserequest/badmethod"
 
   fun apply(h: TestHelper) =>
-    let src = 
+    let src =
       """
       {"jsonrpc": "2.0", "method": 1, "params": "bar"}
       """
-    try 
-      let request = RequestParser.parse_request(src)?
-      h.fail("Request parser should have failed but didn't")
-    end
+    h.assert_is[ParseResult](
+      InvalidRequest,
+      RequestParser.parse_request(src))
 
 class iso _TestParseBadJSON is UnitTest
   """
@@ -33,10 +32,9 @@ class iso _TestParseBadJSON is UnitTest
       """
       {'this won't parse:"boo"}}
       """
-    try
-      let request = RequestParser.parse_request(src)?
-      h.fail("Request parser should have failed but didn't")
-    end
+    h.assert_is[ParseResult](
+      InvalidJson,
+      RequestParser.parse_request(src))
 
 class iso _TestParseRequestNoId is UnitTest
   """
@@ -49,16 +47,18 @@ class iso _TestParseRequestNoId is UnitTest
       """
       {"jsonrpc": "2.0", "method": "foobar", "params": [42, 23]}
       """
-    let request = RequestParser.parse_request(src)?
-    h.assert_eq[String]("foobar", request.method)   
+    let request = RequestParser.parse_request(src) as Request val
+    h.assert_true(request.is_notification())
+    h.assert_eq[String]("foobar", request.method)
     let array = request.params as JsonArray val
     h.assert_eq[USize](2, array.data.size())
     h.assert_eq[I64](42, array.data(0)? as I64)
     h.assert_eq[I64](23, array.data(1)? as I64)
- 
+    h.assert_is[RequestIDType](None, request.id)
+
 class iso _TestParseRequestNoParams is UnitTest
   """
-  Test basic parsing of a JSON-RPC 2.0 request. Test assures that the parser primitive can deal with no Params 
+  Test basic parsing of a JSON-RPC 2.0 request. Test assures that the parser primitive can deal with no Params
   """
   fun name(): String => "JSONRPC/parserequest/noparams"
 
@@ -67,8 +67,11 @@ class iso _TestParseRequestNoParams is UnitTest
       """
       {"jsonrpc": "2.0", "method": "foobar"}
       """
-    let request = RequestParser.parse_request(src)?
-    h.assert_eq[String]("foobar", request.method)    
+    let request = RequestParser.parse_request(src) as Request val
+    h.assert_true(request.is_notification())
+    h.assert_eq[String]("foobar", request.method)
+    h.assert_is[RequestParamsType](None, request.params)
+    h.assert_is[RequestIDType](None, request.id)
 
 class iso _TestParseRequestArrayParams is UnitTest
   """
@@ -76,13 +79,14 @@ class iso _TestParseRequestArrayParams is UnitTest
   """
 
   fun name(): String => "JSONRPC/parserequest/array"
-    
+
   fun apply(h: TestHelper) ? =>
-    let src = 
+    let src =
       """
       {"jsonrpc": "2.0", "method": "subtract", "params": [42, 23], "id": 1}
       """
-    let request = RequestParser.parse_request(src)?
+    let request = RequestParser.parse_request(src) as Request val
+    h.assert_false(request.is_notification())
     h.assert_eq[String]("subtract", request.method)
     match request.id
     | let ids: String => h.fail("Shouldn't get a string for the ID")
@@ -102,13 +106,14 @@ class iso _TestParseRequestObjectParams is UnitTest
   """
 
   fun name(): String => "JSONRPC/parserequest/object"
-    
+
   fun apply(h: TestHelper) ? =>
-    let src = 
+    let src =
       """
       {"jsonrpc": "2.0", "method": "subtract", "params": {"subtrahend": 23, "minuend": 42}, "id": 1}
       """
-    let request = RequestParser.parse_request(src)?
+    let request = RequestParser.parse_request(src) as Request val
+    h.assert_false(request.is_notification())
     h.assert_eq[String]("subtract", request.method)
     match request.id
     | let ids: String => h.fail("Shouldn't get a string for the ID")

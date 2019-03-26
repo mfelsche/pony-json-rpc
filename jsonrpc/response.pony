@@ -1,7 +1,7 @@
 use "json"
 use "collections"
 
-class Response  
+class Response
   let method : String
   let result : JsonType
   let id : RequestIDType
@@ -15,21 +15,21 @@ class Response
 
   fun ref to_json(): String =>
     let doc:JsonDoc = JsonDoc
-    
+
     var dmap: Map[String, JsonType] = Map[String, JsonType]
-    dmap("jsonrpc") = "2.0"      
+    dmap("jsonrpc") = Protocol.version()
     dmap("id") = id
-    
+
     match err
     | let e: Error val => dmap("error") = e.to_jsonobject()
-    else    
-      if result isnt None then        
+    else
+      if result isnt None then
         dmap("result") = result
-      end 
-    end 
-    
-    let obj:JsonObject = JsonObject.from_map(dmap)
+      end
+    end
+
+    let obj: JsonObject = JsonObject.from_map(dmap)
     doc.data = obj
-    doc.string("", false)
+    doc.string()
 
 
