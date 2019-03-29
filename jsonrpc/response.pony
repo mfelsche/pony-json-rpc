@@ -2,16 +2,19 @@ use "json"
 use "collections"
 
 class Response
-  let method : String
   let result : JsonType
   let id : RequestIDType
   let err : (Error val | None)
 
-  new create(method': String, result': JsonType, id': RequestIDType, err' : (Error val| None) = None) =>
-    method = method'
-    result = result'
+  new error(id': RequestIdType. err': Error val) =>
     id = id'
+    result = None
     err = err'
+
+  new success(id': RequestIDType, result': JsonType val) =>
+    id = id'
+    result = result'
+    err = None
 
   fun ref to_json(): String =>
     let doc:JsonDoc = JsonDoc

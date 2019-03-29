@@ -8,22 +8,46 @@ primitive ErrorCodes
   fun internal_error(): I64 => -32603
   fun server_error(): I64 => -32000 // range -32000 to -32099
 
-class Error
-  let code: I64 
+class val Error
+  let code: I64
   let message: String
-  let data: JsonType 
+  let data: JsonType
 
-  new create(code': I64, message': String, data': JsonType) =>
+  new val create(code': I64, message': String, data': JsonType val) =>
     code = code'
     message = message'
     data = data'
+
+  new val method_not_found(method: ( String | None ) = None) =>
+    code = ErrorCodes.method_not_found()
+    message = "Method not found"
+    data = method
+
+  new val parse_error() =>
+    code = ErrorCodes.parse()
+    message = "Parse Error"
+    data = None
+
+  new val invalid_request() =>
+    code = ErrorCodes.invalid_request()
+    message = "Invalid Request"
+    data = None
+
+  new val invalid_params() =>
+    code = ErrorCodes.invalid_params()
+    message = "Invalid params"
+    data = None
+
+  new val internal_error() =>
+    code = ErrorCodes.internal_error()
+    message = "Inernal error"
+    data = None
 
   fun to_jsonobject(): JsonObject =>
     let ob: JsonObject = JsonObject
     ob.data("code") = code
     ob.data("message") = message
-    // TODO - figure out how to add this back in later.
-    //if data isnt None then       
-    //  ob.data("data") = data 
-    //end
-    ob 
+    if data isnt None
+      ob.data("data") = JsonCopy(data)
+    end
+    ob
