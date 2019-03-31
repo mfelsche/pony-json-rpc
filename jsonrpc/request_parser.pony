@@ -4,14 +4,13 @@ primitive InvalidJson
 primitive InvalidRequest
 
 type ParseError is (InvalidJson | InvalidRequest )
-type BatchRequest is Array[(Request val | ParseError)] val
-type ParseResult is (BatchRequest | Request val | ParseError)
+type ParseResult is (BatchRequest | Request | ParseError)
 
 primitive RequestParser
 
   fun tag _parse_batch_request(arr: JsonArray): BatchRequest =>
     let s = arr.data.size()
-    let results = recover iso Array[(Request val | ParseError)](s) end
+    let results = recover trn Array[(Request | ParseError)](s) end
     for elem in arr.data.values() do
       results.push(
         match elem
@@ -21,9 +20,9 @@ primitive RequestParser
         end
       )
     end
-    results
+    BatchRequest(consume results)
 
-  fun tag _parse_single_request(obj: JsonObject): (Request val | ParseError) =>
+  fun tag _parse_single_request(obj: JsonObject): (Request | ParseError) =>
     // verify "jsonrpc": "2.0"
     try
       let protocol = obj.data("jsonrpc")? as String
