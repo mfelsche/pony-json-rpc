@@ -1,34 +1,32 @@
-use "json"
+use "immutable-json"
 
 primitive InvalidJson
 primitive InvalidRequest
 
 type ParseError is (InvalidJson | InvalidRequest )
-type ParseResult is (Request val | ParseError)
+type BatchRequest is Array[(Request val | ParseError)] val
+type ParseResult is (BatchRequest | Request val | ParseError)
 
 primitive RequestParser
 
-  fun tag parse_request(json: String): ParseResult =>
-    let doc: JsonDoc val =
-      try
-        recover
-          let tmp = JsonDoc
-          tmp.parse(json)?
-          consume tmp
+  fun tag _parse_batch_request(arr: JsonArray): BatchRequest =>
+    let s = arr.data.size()
+    let results = recover iso Array[(Request val | ParseError)](s) end
+    for elem in arr.data.values() do
+      results.push(
+        match elem
+        | let obj: JsonObject => _parse_single_request(obj)
+        else
+          InvalidRequest
         end
-      else
-        return InvalidJson
-      end
+      )
+    end
+    results
 
-    let root =
-      try
-        doc.data as JsonObject val
-      else
-        return InvalidRequest
-      end
+  fun tag _parse_single_request(obj: JsonObject): (Request val | ParseError) =>
     // verify "jsonrpc": "2.0"
     try
-      let protocol = root.data("jsonrpc")? as String
+      let protocol = obj.data("jsonrpc")? as String
       if protocol != Protocol.version() then
         return InvalidRequest
       end
@@ -38,15 +36,15 @@ primitive RequestParser
 
     let method =
       try
-        root.data("method")? as String
+        obj.data("method")? as String
       else
         return InvalidRequest
       end
 
     let request_id: RequestIDType =
-      if root.data.contains("id") then
+      if obj.data.contains("id") then
         try
-          match root.data("id")?
+          match obj.data("id")?
           | let i: I64 => i
           | let s: String => s
           | None => None
@@ -65,12 +63,29 @@ primitive RequestParser
     // value. Either by-position through an Array or by-name through an Object.
     let params =
       try
-        match root.data("params")?
-        | let arr: JsonArray val => arr
-        | let obj: JsonObject val => obj
+        match obj.data("params")?
+        | let arr: JsonArray => arr
+        | let params_obj: JsonObject => params_obj
         else
           return InvalidRequest
         end
       end
 
     Request(method, params, request_id)
+
+  fun tag parse_request(json: String): ParseResult =>
+    let doc: JsonDoc = JsonDoc
+    try
+      doc.parse(json)?
+    else
+      return InvalidJson
+    end
+
+    match doc.data
+    | let obj: JsonObject =>
+      _parse_single_request(obj)
+    | let arr: JsonArray if arr.data.size() > 0 =>
+      _parse_batch_request(arr)
+    else
+      InvalidRequest
+    end

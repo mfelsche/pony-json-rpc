@@ -11,7 +11,7 @@ actor Dispatcher
     _methods(method) = handler
 
   fun tag apply(request: Request val): Promise[Response val] =>
-    let promise = Promise[Response val]()
+    let promise = Promise[Response val]
     dispatch_request(request, promise)
     promise
 

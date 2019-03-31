@@ -1,7 +1,7 @@
 use "ponytest"
 use "collections"
 use "promises"
-use "json"
+use "immutable-json"
 
 use ".."
 
@@ -35,11 +35,11 @@ actor _HelloWorld is MethodHandler
   be handle(request: Request val, p: Promise[Response val]) =>
     let name: String =
       try
-        (request.params as JsonArray val).data(0)? as String
+        (request.params as JsonArray).data(0)? as String
       else
         "world!"
       end
     let greet: String = "hello " + name
 
-    let r: Response val = recover val Response(request.method, greet, request.id) end
+    let r: Response val = Response.success(request.id, greet)
     p(r)

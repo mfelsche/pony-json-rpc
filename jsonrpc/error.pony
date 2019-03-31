@@ -1,4 +1,5 @@
-use "json"
+use "immutable-json"
+use "collections"
 
 primitive ErrorCodes
   fun parse(): I64 => -32700
@@ -13,7 +14,7 @@ class val Error
   let message: String
   let data: JsonType
 
-  new val create(code': I64, message': String, data': JsonType val) =>
+  new val create(code': I64, message': String, data': JsonType) =>
     code = code'
     message = message'
     data = data'
@@ -44,10 +45,10 @@ class val Error
     data = None
 
   fun to_jsonobject(): JsonObject =>
-    let ob: JsonObject = JsonObject
-    ob.data("code") = code
-    ob.data("message") = message
-    if data isnt None
-      ob.data("data") = JsonCopy(data)
+    let json_obj = recover trn Map[String, JsonType] end
+    json_obj("code") = code
+    json_obj("message") = message
+    if data isnt None then
+      json_obj("data") = data
     end
-    ob
+    JsonObject(consume json_obj)

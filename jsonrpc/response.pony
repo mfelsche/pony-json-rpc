@@ -1,25 +1,25 @@
-use "json"
+use "immutable-json"
 use "collections"
 
-class Response
-  let result : JsonType
+class val Response
+  let result : JsonType val
   let id : RequestIDType
   let err : (Error val | None)
 
-  new error(id': RequestIdType. err': Error val) =>
+  new val from_error(id': RequestIDType, err': Error val) =>
     id = id'
     result = None
     err = err'
 
-  new success(id': RequestIDType, result': JsonType val) =>
+  new val success(id': RequestIDType, result': JsonType val) =>
     id = id'
     result = result'
     err = None
 
-  fun ref to_json(): String =>
-    let doc:JsonDoc = JsonDoc
+  fun box to_json(): String =>
+    let doc: JsonDoc = JsonDoc
 
-    var dmap: Map[String, JsonType] = Map[String, JsonType]
+    var dmap: Map[String, JsonType] trn = recover Map[String, JsonType] end
     dmap("jsonrpc") = Protocol.version()
     dmap("id") = id
 
@@ -31,7 +31,7 @@ class Response
       end
     end
 
-    let obj: JsonObject = JsonObject.from_map(dmap)
+    let obj: JsonObject = JsonObject(consume dmap)
     doc.data = obj
     doc.string()
 

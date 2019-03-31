@@ -1,2 +1,2 @@
-jsonrpc/test/test
-**test.dSYM**
+/build/
+/.deps/

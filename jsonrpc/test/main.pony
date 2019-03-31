@@ -5,12 +5,7 @@ actor Main is TestList
   new make() => None
 
   fun tag tests(test: PonyTest) =>
-    test(_TestParseRequestArrayParams)
-    test(_TestParseRequestObjectParams)
-    test(_TestParseRequestNoId)
-    test(_TestParseRequestNoParams)
-    test(_TestParseBadJSON)
-    test(_TestBadMethod)
+    ParserTests.tests(test)
 
     test(_TestResponseScalar)
     test(_TestResponseArray)
