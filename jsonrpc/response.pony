@@ -16,9 +16,7 @@ class val Response
     result = result'
     err = None
 
-  fun box to_json(): String =>
-    let doc: JsonDoc = JsonDoc
-
+  fun box to_jsonobject(): JsonObject =>
     var dmap: Map[String, JsonType] trn = recover Map[String, JsonType] end
     dmap("jsonrpc") = Protocol.version()
     dmap("id") = id
@@ -30,9 +28,12 @@ class val Response
         dmap("result") = result
       end
     end
+    JsonObject(consume dmap)
 
-    let obj: JsonObject = JsonObject(consume dmap)
-    doc.data = obj
+  fun box to_json(): String =>
+    let doc: JsonDoc = JsonDoc
+
+    doc.data = to_jsonobject()
     doc.string()
 
 
